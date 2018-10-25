@@ -2,6 +2,12 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -96,8 +102,28 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
-    static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+
+    // N - кол-во строк во входном файле.
+    // Трудоёмкость: T = O(N * log(N)). За счёт того, что Collections.sort соритрует слияниями.
+    // Ресурсоёмкость: R = O(N). За счёт того, что испольован список длиной N.
+    static public void sortTemperatures(String inputName, String outputName) throws IOException {
+        final List<Double> listOfTemps = new ArrayList<Double>();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+            String newLine;
+            while ((newLine = br.readLine()) != null) {
+                final Double newTemp = Double.valueOf(newLine);
+                if (newTemp >= -273 && newTemp <= 500) {
+                    listOfTemps.add(newTemp);
+                } else throw new IllegalArgumentException();
+            }
+        }
+        Collections.sort(listOfTemps);
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputName))) {
+            for (Double temp : listOfTemps) {
+                bw.write(String.valueOf(temp));
+                bw.newLine();
+            }
+        }
     }
 
     /**
@@ -129,8 +155,50 @@ public class JavaTasks {
      * 2
      * 2
      */
-    static public void sortSequence(String inputName, String outputName) {
-        throw new NotImplementedError();
+
+    // N - кол-во строк во входном файле.
+    // Трудоёмкость: T = O(N).
+    // Ресурсоёмкость: R = O(N). В худшем случае, если во входном файле отсутствуют одинаковые числа, длина Map составит N
+    static public void sortSequence(String inputName, String outputName) throws IOException {
+        final HashMap<Integer, Integer> mapOfCounters = new HashMap<Integer, Integer>();
+        Integer maxValue = -1;
+        Integer keyOfMaxValue = -1;
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+            String newLine;
+            while ((newLine = br.readLine()) != null) {
+                final Integer newKey = Integer.valueOf(newLine);
+                if (newKey > 0) {
+                    Integer value = mapOfCounters.get(newKey);
+                    if (value != null) {
+                        mapOfCounters.put(newKey, ++value);
+                    } else {
+                        mapOfCounters.put(newKey, 1);
+                        value = 1;
+                    }
+                    if (value > maxValue || keyOfMaxValue == -1) {
+                        maxValue = value;
+                        keyOfMaxValue = newKey;
+                    } else if (value.equals(maxValue) && newKey < keyOfMaxValue) {
+                        keyOfMaxValue = newKey;
+                    }
+                } else throw new IllegalArgumentException();
+            }
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputName))) {
+                String newLine;
+                while ((newLine = br.readLine()) != null) {
+                    if (!Integer.valueOf(newLine).equals(keyOfMaxValue)) {
+                        bw.write(newLine);
+                        bw.newLine();
+                    }
+                }
+                for (int i = 0; i < maxValue; i++) {
+                    bw.write(String.valueOf(keyOfMaxValue));
+                    bw.newLine();
+                }
+            }
+        }
     }
 
     /**
