@@ -646,6 +646,8 @@ abstract class AbstractAlgorithmsTests {
 Еще старушка не забыла
                 """.trimIndent()
                 ))
+        assertEquals("", longestCommonSubstring("яблоко", ""))
+        assertEquals("", longestCommonSubstring("", ""))
     }
 
     fun calcPrimesNumber(calcPrimesNumber: (Int) -> Int) {
@@ -675,5 +677,9 @@ abstract class AbstractAlgorithmsTests {
     fun baldaSearcher(baldaSearcher: (String, Set<String>) -> Set<String>) {
         assertEquals(setOf("ТРАВА", "КРАН", "АКВА", "НАРТЫ"),
                 baldaSearcher("input/balda_in1.txt", setOf("ТРАВА", "КРАН", "АКВА", "НАРТЫ", "РАК")))
+        assertEquals(setOf("БЛОК", "ЧИХ", "ЛУК", "ОКО", "ОКОП", "ОКУНЬ", "ШЛАКОБЛОКУНЬ", "ЧАЙ"),
+                baldaSearcher("input/balda_in2.txt", setOf("БЛОК", "ЧИХ", "ЛУК", "ОКО", "ОКОП",
+                        "ОКУНЬ", "ШЛАКОБЛОКУНЬ", "ЧАЙ", "МОЗГИ")))
+        assertEquals(emptySet<String>(), baldaSearcher("input/balda_in3.txt", setOf("ПАНОРАМА")))
     }
 }
