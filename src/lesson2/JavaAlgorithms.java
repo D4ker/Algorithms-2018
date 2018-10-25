@@ -3,6 +3,13 @@ package lesson2;
 import kotlin.NotImplementedError;
 import kotlin.Pair;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -96,8 +103,43 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+
+    // N - длина первого слова, M - длина второго.
+    // Трудоёмкость: T = O(N * M). Связано с тем, что в коде испольован цикл в цикле.
+    // Ресурсоёмкость: R = O(M). За счёт того, что при решении был испольован одномерный массив, вместо двумерного.
+    static public String longestCommonSubstring(String first, String second) {
+        final int[] arrayOfCounters = new int[second.length()];
+        int maxCounter = 0;
+        int indexOfMaxCounter = -1;
+        for (int i = 0; i < first.length(); i++) {
+            final char letter = first.charAt(i);
+            for (int j = second.length() - 1; j >= 0; j--) {
+                if (letter == second.charAt(j)) {
+                    if (j != 0) {
+                        // Берём левый верхний счётчик, увеличиваем значение на 1 и записываем результат в текущий
+                        final int newLeftUpCounter = arrayOfCounters[j - 1] + 1;
+                        arrayOfCounters[j] = newLeftUpCounter;
+                        if (newLeftUpCounter > maxCounter) {
+                            maxCounter = newLeftUpCounter;
+                            indexOfMaxCounter = j;
+                        }
+                    } else {
+                        arrayOfCounters[0] = 1;
+                        if (1 > maxCounter) {
+                            maxCounter = 1;
+                            indexOfMaxCounter = 0;
+                        }
+                    }
+                } else {
+                    arrayOfCounters[j] = 0;
+                }
+            }
+        }
+        if (indexOfMaxCounter == -1) {
+            return "";
+        }
+        final int endIndex = indexOfMaxCounter + 1;
+        return second.substring(endIndex - maxCounter, endIndex);
     }
 
     /**
@@ -140,7 +182,92 @@ public class JavaAlgorithms {
      * В файле буквы разделены пробелами, строки -- переносами строк.
      * Остальные символы ни в файле, ни в словах не допускаются.
      */
-    static public Set<String> baldaSearcher(String inputName, Set<String> words) {
-        throw new NotImplementedError();
+
+    // N - кол-во строк в файле, M - длина слов в файле, W - кол-во искомых слов, L - кол-во букв в искомом слове
+    // Трудоёмкость: T = O(W * N * M * L).
+    // Ресурсоёмкость: R = O(N * M).
+    static public Set<String> baldaSearcher(String inputName, Set<String> words) throws IOException {
+        final List<String> listOfLetters = new ArrayList<String>();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+            String newLine;
+            while ((newLine = br.readLine()) != null) {
+                listOfLetters.add(newLine);
+            }
+        }
+        final int height = listOfLetters.size();
+        final int width = listOfLetters.get(0).length() / 2 + 1;
+        final char[][] arrayOfLetters = new char[height][width];
+        for (int i = 0; i < height; i++) {
+            final String[] stringLetters = listOfLetters.get(i).split(" ");
+            for (int j = 0; j < width; j++) {
+                arrayOfLetters[i][j] = stringLetters[j].charAt(0);
+            }
+        }
+        final Set<String> foundWords = new HashSet<String>();
+        final boolean[][] checksArray = new boolean[height][width];
+        for (String word: words) {
+            updateChecksArray(checksArray);
+            final char firstLetter = word.charAt(0);
+            boolean nextWord = false;
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    if (arrayOfLetters[i][j] == firstLetter && wordIsFound(i, j, word, 1, arrayOfLetters, checksArray)) {
+                        foundWords.add(word);
+                        nextWord = true;
+                        break;
+                    }
+                }
+                if (nextWord) {
+                    break;
+                }
+            }
+        }
+        return foundWords;
+    }
+
+    // Метод для обновления массива, хранящего путь, проходимый рекурсивной функцией wordIsFound
+    // Трудоёмкость: T = O(N * M).
+    private static void updateChecksArray(boolean[][] checksArray) {
+        final int width = checksArray[0].length;
+        for (int i = 0; i < checksArray.length; i++) {
+            for (int j = 0; j < width; j++) {
+                checksArray[i][j] = false;
+            }
+        }
+    }
+
+    /* Метод для поиска слова в массиве.
+    i, j - индексы новой проверяемой буквы в массиве;
+    word - искомое слово;
+    wordLetterIndex - индекс текущей проверяемой буквы слова word;
+    searchArray - массив для поиска;
+    checksArray - массив, хранящий путь, пройденный при поиске слова (необходим для того, чтобы уже проверенную
+    букву нелья было использовать второй раз). */
+    // Трудоёмкость: T = O(L).
+    private static boolean wordIsFound(int i, int j, String word, int wordLetterIndex, char[][] searchArray, boolean[][] checksArray) {
+        checksArray[i][j] = true;
+        if (wordLetterIndex == word.length()) {
+            return true;
+        }
+        final char checkedLetter = word.charAt(wordLetterIndex);
+        boolean found = false;
+        final int left = j - 1;
+        final int up = i - 1;
+        final int right = j + 1;
+        final int down = i + 1;
+        final int nextIndex = wordLetterIndex + 1;
+        if (found == false && left >= 0 && checksArray[i][left] == false && searchArray[i][left] == checkedLetter) {
+            found = wordIsFound(i, left, word, nextIndex, searchArray, checksArray);
+        }
+        if (found == false && up >= 0 && checksArray[up][j] == false && searchArray[up][j] == checkedLetter) {
+            found = wordIsFound(up, j, word, nextIndex, searchArray, checksArray);
+        }
+        if (found == false && right < searchArray[0].length && checksArray[i][right] == false && searchArray[i][right] == checkedLetter) {
+            found = wordIsFound(i, right, word, nextIndex, searchArray, checksArray);
+        }
+        if (found == false && down < searchArray.length && checksArray[down][j] == false && searchArray[down][j] == checkedLetter) {
+            found = wordIsFound(down, j, word, nextIndex, searchArray, checksArray);
+        }
+        return found;
     }
 }
