@@ -3,6 +3,7 @@ package lesson3
 import org.junit.jupiter.api.Tag
 import kotlin.test.Test
 import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -75,6 +76,27 @@ class BinaryTreeTest {
             }
             assertTrue(binarySet.checkInvariant())
         }
+
+        // Тесты на особые случаи
+        // Случай, когда пытаемся удалить элемент в пустом дереве
+        val binarySet = create()
+        assertFalse(binarySet.remove(2))
+        assertEquals<Set<*>>(emptySet<Int>(), binarySet)
+        assertEquals(0, binarySet.size)
+
+        // Случай, когда пытаемся удалить несуществующий элемент в заполненном дереве
+        binarySet += 5
+        binarySet += 12
+        binarySet += 7
+        binarySet += 2
+        assertFalse(binarySet.remove(4))
+        assertEquals<SortedSet<*>>(sortedSetOf<Int>(2, 5, 7, 12), binarySet)
+        assertEquals(4, binarySet.size)
+
+        // Случай, когда пытаемся положить null как аргумент
+        assertFalse(binarySet.remove(null))
+        assertEquals<SortedSet<*>>(sortedSetOf<Int>(2, 5, 7, 12), binarySet)
+        assertEquals(4, binarySet.size)
     }
 
     @Test
@@ -109,6 +131,24 @@ class BinaryTreeTest {
                 assertEquals(treeIt.next(), binaryIt.next())
             }
         }
+
+        // Тесты на особые случаи
+        // Случай, когда дерево пустое
+        val binarySet = create()
+        val binaryIt = binarySet.iterator()
+        assertFalse(binaryIt.hasNext())
+        try {
+            binaryIt.next()
+        } catch (e: NoSuchElementException) {}
+
+        // Случай, когда итератор выходит за границы
+        binarySet += 5
+        binarySet += 12
+        binarySet += 7
+        binarySet += 2
+        try {
+            binaryIt.next()
+        } catch (e: NoSuchElementException) {}
     }
 
     @Test
@@ -157,6 +197,25 @@ class BinaryTreeTest {
             }
             assertTrue(binarySet.checkInvariant())
         }
+
+        // Тесты на особые случаи
+        // Случай, когда дерево пустое
+        val binarySet = create()
+        val binaryIt = binarySet.iterator()
+        try {
+            binaryIt.remove()
+        } catch (e: NoSuchElementException) {}
+
+        // Случай, когда удаляется последний элемент в дереве
+        binarySet += 2
+        binaryIt.next()
+        binaryIt.remove()
+        try {
+            binaryIt.remove()
+        } catch (e: NoSuchElementException) {}
+        try {
+            binaryIt.next()
+        } catch (e: NoSuchElementException) {}
     }
 
     @Test
