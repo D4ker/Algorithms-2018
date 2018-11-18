@@ -65,16 +65,17 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
      * Средняя
      */
 
-    // H - высота дерева.
-    // Трудоёмкость: T = O(H).
-    // Ресурсоёмкость: R = O(H).
+    // N - кол-во узлов в дереве.
+    // Трудоёмкость: T = O(Log(N)) - в среднем; T = O(N) - в худшем случае.
+    // Ресурсоёмкость: R = O(Log(N)) - в среднем; R = O(N) - в худшем случае.
     @Override
     public boolean remove(Object o) {
+        @SuppressWarnings("unchecked")
         final T value = (T) o;
         if (root == null || o == null) return false;
         final List<Node<T>> removable = findWithParent(root, null, value);
-        Node<T> removableNode = removable.get(0);
-        Node<T> removableNodeParent = removable.get(1);
+        final Node<T> removableNode = removable.get(0);
+        final Node<T> removableNodeParent = removable.get(1);
         if (value.compareTo(removableNode.value) == 0) {
             final Node<T> leftNode = removableNode.left;
             final Node<T> rightNode = removableNode.right;
@@ -87,15 +88,15 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             } else if (leftNode == null) {
                 childModify(removableNodeParent, rightNode, removableParentSide);
             } else {
-                Node<T> leftNodeOfRightNode = rightNode.left;
+                final Node<T> leftNodeOfRightNode = rightNode.left;
                 if (leftNodeOfRightNode == null) {
                     childModify(removableNodeParent, rightNode, removableParentSide);
                     rightNode.left = leftNode;
                 } else {
                     final List<Node<T>> insteadOfRemote = findWithParent(leftNodeOfRightNode, rightNode, value);
-                    Node<T> insteadOfRemoteNode = insteadOfRemote.get(0);
-                    Node<T> insteadOfRemoteNodeParent = insteadOfRemote.get(1);
-                    Node<T> newNode = new Node<T>(insteadOfRemoteNode.value);
+                    final Node<T> insteadOfRemoteNode = insteadOfRemote.get(0);
+                    final Node<T> insteadOfRemoteNodeParent = insteadOfRemote.get(1);
+                    final Node<T> newNode = new Node<T>(insteadOfRemoteNode.value);
                     newNode.left = leftNode;
                     newNode.right = rightNode;
                     childModify(removableNodeParent, newNode, removableParentSide);
@@ -122,12 +123,12 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     }
 
     // Поиск узла и его родителя в дереве.
-    // L - высота дерева, корнем которого является start.
-    // Трудоёмкость: T = O(L).
-    // Ресурсоёмкость: R = O(L).
+    // L - кол-во узлов в дереве, корнем которого является start.
+    // Трудоёмкость: T = O(Log(L)) - в среднем; T = O(L) - в худшем случае.
+    // Ресурсоёмкость: R = O(Log(L)) - в среднем; R = O(L) - в худшем случае.
     private List<Node<T>> findWithParent(Node<T> start, Node<T> parent, T value) {
         if (start == null) return null;
-        int comparison = value.compareTo(start.value);
+        final int comparison = value.compareTo(start.value);
         final List<Node<T>> list = new ArrayList<Node<T>>();
         list.add(start);
         list.add(parent);
@@ -183,9 +184,9 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
          * Средняя
          */
 
-        // H - высота дерева.
-        // Трудоёмкость: T = O(H).
-        // Ресурсоёмкость: R = O(H).
+        // N - кол-во узлов в дереве.
+        // Трудоёмкость: T = O(Log(N)) - в среднем; T = O(N) - в худшем случае.
+        // Ресурсоёмкость: R = O(Log(N)) - в среднем; R = O(N) - в худшем случае.
         private Node<T> findNext() {
             if (current == null) {
                 return minNode(root);
@@ -197,12 +198,13 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             }
         }
 
-        // L - высота дерева, корнем которого является start.
-        // Трудоёмкость: T = O(L).
-        // Ресурсоёмкость: R = O(L).
+        // Поиск предыдущего/следующего узла в итераторе.
+        // L - кол-во узлов в дереве, корнем которого является start.
+        // Трудоёмкость: T = O(Log(L)) - в среднем; T = O(L) - в худшем случае.
+        // Ресурсоёмкость: R = O(Log(L)) - в среднем; R = O(L) - в худшем случае.
         private Node<T> findPrevNextNode(Node<T> start, T value, Node<T> desiredNode, boolean next) {
             if (start == null) return null;
-            int comparison = value.compareTo(start.value);
+            final int comparison = value.compareTo(start.value);
             if (comparison == 0) {
                 return desiredNode;
             }
@@ -220,6 +222,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             }
         }
 
+        // Поиск минимального узла в дереве с корнем node.
         private Node<T> minNode(Node<T> node) {
             if (node == null) return null;
             Node<T> currentNode = node;
@@ -248,9 +251,9 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
          * Сложная
          */
 
-        // H - высота дерева.
-        // Трудоёмкость: T = O(H).
-        // Ресурсоёмкость: R = O(H).
+        // N - кол-во узлов в дереве.
+        // Трудоёмкость: T = O(Log(N)) - в среднем; T = O(N) - в худшем случае.
+        // Ресурсоёмкость: R = O(Log(N)) - в среднем; R = O(N) - в худшем случае.
         @Override
         public void remove() {
             if (current != null) {
