@@ -1,6 +1,6 @@
 package lesson3;
 
-import kotlin.NotImplementedError;
+import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,9 +73,9 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         @SuppressWarnings("unchecked")
         final T value = (T) o;
         if (root == null || o == null) return false;
-        final List<Node<T>> removable = findWithParent(root, null, value);
-        final Node<T> removableNode = removable.get(0);
-        final Node<T> removableNodeParent = removable.get(1);
+        final Pair<Node<T>, Node<T>> removable = findWithParent(root, null, value);
+        final Node<T> removableNode = removable.getFirst();
+        final Node<T> removableNodeParent = removable.getSecond();
         if (value.compareTo(removableNode.value) == 0) {
             final Node<T> leftNode = removableNode.left;
             final Node<T> rightNode = removableNode.right;
@@ -93,9 +93,9 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
                     childModify(removableNodeParent, rightNode, removableParentSide);
                     rightNode.left = leftNode;
                 } else {
-                    final List<Node<T>> insteadOfRemote = findWithParent(leftNodeOfRightNode, rightNode, value);
-                    final Node<T> insteadOfRemoteNode = insteadOfRemote.get(0);
-                    final Node<T> insteadOfRemoteNodeParent = insteadOfRemote.get(1);
+                    final Pair<Node<T>, Node<T>> insteadOfRemote = findWithParent(leftNodeOfRightNode, rightNode, value);
+                    final Node<T> insteadOfRemoteNode = insteadOfRemote.getFirst();
+                    final Node<T> insteadOfRemoteNodeParent = insteadOfRemote.getSecond();
                     final Node<T> newNode = new Node<T>(insteadOfRemoteNode.value);
                     newNode.left = leftNode;
                     newNode.right = rightNode;
@@ -126,21 +126,19 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     // L - кол-во узлов в дереве, корнем которого является start.
     // Трудоёмкость: T = O(Log(L)) - в среднем; T = O(L) - в худшем случае.
     // Ресурсоёмкость: R = O(Log(L)) - в среднем; R = O(L) - в худшем случае.
-    private List<Node<T>> findWithParent(Node<T> start, Node<T> parent, T value) {
+    private Pair<Node<T>, Node<T>> findWithParent(Node<T> start, Node<T> parent, T value) {
         if (start == null) return null;
         final int comparison = value.compareTo(start.value);
-        final List<Node<T>> list = new ArrayList<Node<T>>();
-        list.add(start);
-        list.add(parent);
+        final Pair<Node<T>, Node<T>> pair = new Pair<Node<T>, Node<T>>(start, parent);
         if (comparison == 0) {
-            return list;
+            return pair;
         }
         else if (comparison < 0) {
-            if (start.left == null) return list;
+            if (start.left == null) return pair;
             return findWithParent(start.left, start, value);
         }
         else {
-            if (start.right == null) return list;
+            if (start.right == null) return pair;
             return findWithParent(start.right, start, value);
         }
     }
@@ -223,6 +221,9 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         }
 
         // Поиск минимального узла в дереве с корнем node.
+        // L - кол-во узлов в дереве, корнем которого является node.
+        // Трудоёмкость: T = O(Log(L)) - в среднем; T = O(L) - в худшем случае.
+        // Ресурсоёмкость: R = O(Log(L)) - в среднем; R = O(L) - в худшем случае.
         private Node<T> minNode(Node<T> node) {
             if (node == null) return null;
             Node<T> currentNode = node;
@@ -289,9 +290,13 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
      */
     @NotNull
     @Override
+
+    // Оценки методов BinaryTreeSet можно посмотреть в соответствующем классе.
+    // Трудоёмкость: T = O(1).
+    // Ресурсоёмкость: R = O(1).
     public SortedSet<T> subSet(T fromElement, T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        if (root == null || fromElement == null || toElement == null) throw new NoSuchElementException();
+        return new BinaryTreeSet<T>(this, fromElement, toElement);
     }
 
     /**
@@ -301,25 +306,12 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
 
-    // Оценка для худшего случая.
-    // N - кол-во узлов в дереве.
-    // Трудоёмкость: T = O(N).
-    // Ресурсоёмкость: R = O(N).
+    // Оценки методов BinaryTreeSet можно посмотреть в соответствующем классе.
+    // Трудоёмкость: T = O(1).
+    // Ресурсоёмкость: R = O(1).
     public SortedSet<T> headSet(T toElement) {
         if (root == null || toElement == null) throw new NoSuchElementException();
-        final SortedSet<T> headSet = new TreeSet<T>();
-        headSetSearcher(headSet, root, toElement);
-        return headSet;
-    }
-
-    private void headSetSearcher(SortedSet<T> headSet, Node<T> node, T value) {
-        if (node != null) {
-            headSetSearcher(headSet, node.left, value);
-            if (node.value.compareTo(value) < 0) {
-                headSet.add(node.value);
-                headSetSearcher(headSet, node.right, value);
-            }
-        }
+        return new BinaryTreeSet<T>(this, null, toElement);
     }
 
     /**
@@ -329,25 +321,12 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     @NotNull
     @Override
 
-    // Оценка для худшего случая.
-    // N - кол-во узлов в дереве.
-    // Трудоёмкость: T = O(N).
-    // Ресурсоёмкость: R = O(N).
+    // Оценки методов BinaryTreeSet можно посмотреть в соответствующем классе.
+    // Трудоёмкость: T = O(1).
+    // Ресурсоёмкость: R = O(1).
     public SortedSet<T> tailSet(T fromElement) {
         if (root == null || fromElement == null) throw new NoSuchElementException();
-        final SortedSet<T> tailSet = new TreeSet<T>();
-        tailSetSearcher(tailSet, root, fromElement);
-        return tailSet;
-    }
-
-    private void tailSetSearcher(SortedSet<T> tailSet, Node<T> node, T value) {
-        if (node != null) {
-            tailSetSearcher(tailSet, node.left, value);
-            if (node.value.compareTo(value) >= 0) {
-                tailSet.add(node.value);
-            }
-            tailSetSearcher(tailSet, node.right, value);
-        }
+        return new BinaryTreeSet<T>(this, fromElement, null);
     }
 
     @Override
