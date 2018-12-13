@@ -45,11 +45,13 @@ abstract class AbstractHeadTailTest {
         val binarySet = BinaryTree<Int>()
         try {
             binarySet.headSet(4)
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
 
         // Случай, когда пытаемся положить null как аргумент
         try {
             tree.headSet(null)
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
 
         // Случай, когда пытаемся вывать метод для узла, которого нет в дереве
@@ -100,11 +102,13 @@ abstract class AbstractHeadTailTest {
         val binarySet = BinaryTree<Int>()
         try {
             binarySet.tailSet(4)
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
 
         // Случай, когда пытаемся положить null как аргумент
         try {
             tree.tailSet(null)
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
 
         // Случай, когда пытаемся вывать метод для узла, которого нет в дереве
@@ -226,11 +230,13 @@ abstract class AbstractHeadTailTest {
         val binarySet = BinaryTree<Int>()
         try {
             binarySet.subSet(2, 4)
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
 
         // Случай, когда пытаемся положить null как аргумент
         try {
             tree.subSet(null, null)
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
 
         // Случай, когда пытаемся вывать метод для узла, которого нет в дереве

@@ -139,6 +139,7 @@ class BinaryTreeTest {
         assertFalse(binaryIt.hasNext())
         try {
             binaryIt.next()
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
 
         // Случай, когда итератор выходит за границы
@@ -147,7 +148,10 @@ class BinaryTreeTest {
         binarySet += 7
         binarySet += 2
         try {
-            binaryIt.next()
+            for (i in 0..binarySet.size) {
+                binaryIt.next()
+            }
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
     }
 
@@ -204,6 +208,7 @@ class BinaryTreeTest {
         val binaryIt = binarySet.iterator()
         try {
             binaryIt.remove()
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
 
         // Случай, когда удаляется последний элемент в дереве
@@ -212,9 +217,11 @@ class BinaryTreeTest {
         binaryIt.remove()
         try {
             binaryIt.remove()
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
         try {
             binaryIt.next()
+            assertFalse(true)
         } catch (e: NoSuchElementException) {}
     }
 
