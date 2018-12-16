@@ -44,12 +44,27 @@ abstract class AbstractDynamicTests {
                 23, 76, 34, 93, 123, 21, 56, 87, 91, 12, 45, 98, 140, 12, 5, 38, 349, 65, 94,
                 45, 76, 15, 99, 100, 88, 84, 35, 88
         )))
+
+        assertEquals(listOf(-2), longestIncreasingSubSequence(listOf(-2)))
+        assertEquals(listOf(-2), longestIncreasingSubSequence(listOf(-2, -8)))
+        assertEquals(listOf(-17, -13), longestIncreasingSubSequence(listOf(-17, -13)))
+        assertEquals(listOf(-23, -7, -5, -3, 3), longestIncreasingSubSequence(listOf(3, -23, 51, -7, -5, -20, 45, -3, 3)))
+
+        assertEquals(listOf(Integer.MAX_VALUE), longestIncreasingSubSequence(listOf(Integer.MAX_VALUE)))
+        assertEquals(listOf(5, 7, Integer.MAX_VALUE), longestIncreasingSubSequence(listOf(5, 7, 3, Integer.MAX_VALUE)))
+        assertEquals(listOf(3, 4, 5, 8, 15, Integer.MAX_VALUE), longestIncreasingSubSequence(listOf(
+                3, 4, 5, Integer.MAX_VALUE, 8, 7, 15, Integer.MAX_VALUE, 6, 17)))
     }
 
     fun shortestPathOnField(shortestPathOnField: (String) -> Int) {
         assertEquals(1, shortestPathOnField("input/field_in2.txt"))
         assertEquals(12, shortestPathOnField("input/field_in1.txt"))
         assertEquals(43, shortestPathOnField("input/field_in3.txt"))
+
+        assertEquals(16, shortestPathOnField("input/field_in4.txt"))
+        assertEquals(59, shortestPathOnField("input/field_in5.txt"))
+        assertEquals(71, shortestPathOnField("input/field_in6.txt"))
+        assertEquals(0, shortestPathOnField("input/field_in7.txt"))
     }
 
 }
