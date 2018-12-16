@@ -47,6 +47,7 @@ public class JavaDynamicTasks {
         final int n = list.size();
         final Integer[] minEndElementForLength = new Integer[n];
         final int[] indexes = new int[n];
+        final boolean[] checks = new boolean[n];
 
         // Заполнение вспомогательного массива бесконечностями
         for (int i = 0; i < n; i++) {
@@ -56,7 +57,7 @@ public class JavaDynamicTasks {
         // Вычисление длин (индексов) подпоследовательностей
         int minEndIndexOfMaxSequence = 0;
         for (int i = 0; i < n; i++) {
-            final int j = binarySearch(minEndElementForLength, list.get(i));
+            final int j = binarySearch(checks, minEndElementForLength, list.get(i));
             if ((j == 0 || minEndElementForLength[j - 1] <= list.get(i)) && list.get(i) <= minEndElementForLength[j]) {
                 if (j > indexes[minEndIndexOfMaxSequence]) {
                     minEndIndexOfMaxSequence = i;
@@ -65,6 +66,7 @@ public class JavaDynamicTasks {
                     indexes[i] = j;
                 }
                 minEndElementForLength[j] = list.get(i);
+                checks[j] = true;
             }
         }
 
@@ -91,17 +93,23 @@ public class JavaDynamicTasks {
     }
 
     // Вспомогательный метод для бинарного поиска
-    private static int binarySearch(Integer[] a, Integer key) {
+    private static int binarySearch(boolean[] checks, Integer[] a, final Integer key) {
         int low = 0;
         int high = a.length - 1;
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
             int cmp = a[mid].compareTo(key);
-            if (cmp < 0)
+            if (cmp < 0) {
                 low = mid + 1;
-            else {
+            } else if (cmp > 0) {
                 high = mid - 1;
+            } else {
+                if (checks[mid] == false) {
+                    high = mid - 1;
+                } else {
+                    low = mid + 1;
+                }
             }
         }
         return low;
