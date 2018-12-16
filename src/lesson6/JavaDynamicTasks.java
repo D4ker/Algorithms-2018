@@ -2,6 +2,10 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -33,8 +37,74 @@ public class JavaDynamicTasks {
      * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
+
+    // N - кол-во элементов в списке.
+    // Трудоёмкость: T = O(N * log(N)). За счёт использования при решении бинарного поиска.
+    // Ресурсоёмкость: R = O(N).
     public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
-        throw new NotImplementedError();
+        if (list.isEmpty()) return new ArrayList<>();
+
+        final int n = list.size();
+        final Integer[] minEndElementForLength = new Integer[n];
+        final int[] indexes = new int[n];
+
+        // Заполнение вспомогательного массива бесконечностями
+        for (int i = 0; i < n; i++) {
+            minEndElementForLength[i] = Integer.MAX_VALUE;
+        }
+
+        // Вычисление длин (индексов) подпоследовательностей
+        int minEndIndexOfMaxSequence = 0;
+        for (int i = 0; i < n; i++) {
+            final int j = binarySearch(minEndElementForLength, list.get(i));
+            if ((j == 0 || minEndElementForLength[j - 1] <= list.get(i)) && list.get(i) <= minEndElementForLength[j]) {
+                if (j > indexes[minEndIndexOfMaxSequence]) {
+                    minEndIndexOfMaxSequence = i;
+                    indexes[i] = j;
+                } else {
+                    indexes[i] = j;
+                }
+                minEndElementForLength[j] = list.get(i);
+            }
+        }
+
+        // Восстановление ответа
+        final List<Integer> subSequence = new ArrayList<>();
+        int currentFindingIndex = indexes[minEndIndexOfMaxSequence] - 1;
+        for (int i = 0; i <= currentFindingIndex; i++) {
+            subSequence.add(0);
+        }
+        subSequence.add(list.get(minEndIndexOfMaxSequence));
+
+        for (int i = minEndIndexOfMaxSequence - 1; i >= 0; i--) {
+            final int index = indexes[i];
+            final Integer value = list.get(i);
+            if (index == currentFindingIndex && value <= subSequence.get(index + 1)) {
+                currentFindingIndex--;
+                subSequence.set(index, value);
+            } else if (index > currentFindingIndex && value <= subSequence.get(index + 1)) {
+                subSequence.set(index, value);
+            }
+        }
+
+        return subSequence;
+    }
+
+    // Вспомогательный метод для бинарного поиска
+    private static int binarySearch(Integer[] a, Integer key) {
+        int low = 0;
+        int high = a.length - 1;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            int cmp = a[mid].compareTo(key);
+            if (cmp < 0)
+                low = mid + 1;
+            else {
+                high = mid - 1;
+            }
+        }
+        return low;
     }
 
     /**
@@ -57,8 +127,36 @@ public class JavaDynamicTasks {
      *
      * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
      */
-    public static int shortestPathOnField(String inputName) {
-        throw new NotImplementedError();
+
+    // N - высота поля, M - ширина.
+    // Трудоёмкость: T = O(N * M).
+    // Ресурсоёмкость: R = O(M).
+    public static int shortestPathOnField(String inputName) throws IOException {
+        int[] oldArrayOfWeights;
+        final int width;
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+            String newLine;
+            if ((newLine = br.readLine()) != null) {
+                width = newLine.length() / 2 + 1;
+                oldArrayOfWeights = new int[width];
+                oldArrayOfWeights[0] = 0;
+                for (int i = 1; i < width; i++) {
+                    oldArrayOfWeights[i] = oldArrayOfWeights[i - 1] + newLine.charAt(i * 2) - 48;
+                }
+            } else {
+                throw new IllegalArgumentException(); // Пустой файл
+            }
+            final int[] arrayOfWeights = new int[width];
+            while ((newLine = br.readLine()) != null) {
+                arrayOfWeights[0] = oldArrayOfWeights[0] + newLine.charAt(0) - 48;
+                for (int i = 1; i < width; i++) {
+                    arrayOfWeights[i] = newLine.charAt(i * 2) - 48 +
+                            Math.min(arrayOfWeights[i - 1], Math.min(oldArrayOfWeights[i - 1], oldArrayOfWeights[i]));
+                }
+                System.arraycopy(arrayOfWeights, 0, oldArrayOfWeights, 0, oldArrayOfWeights.length);
+            }
+        }
+        return oldArrayOfWeights[width - 1];
     }
 
     // Задачу "Максимальное независимое множество вершин в графе без циклов"
